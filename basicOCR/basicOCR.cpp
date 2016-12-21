@@ -83,7 +83,10 @@ void basicOCR::getData()
 
 void basicOCR::train()
 {
-	knn=new CvKNearest( trainData, trainClasses, 0, false, K );
+	knn=cv::ml::KNearest::create();
+	cv::Mat data(trainData->rows, trainData->cols, trainData->type, trainData->data.ptr, 0);
+	cv::Mat resp(trainClasses->rows, trainClasses->cols, trainClasses->type, trainClasses->data.ptr, 0);
+	knn->train(data, 0, resp);
 }
 
 float basicOCR::classify(IplImage* img, int showResult)
@@ -102,7 +105,10 @@ float basicOCR::classify(IplImage* img, int showResult)
 	CvMat row_header, *row1;
 	row1 = cvReshape( &data, &row_header, 0, 1 );
 
-	result=knn->find_nearest(row1,K,0,0,nearest,0);
+	//result=knn->find_nearest(row1,K,0,0,nearest,0);
+	cv::Mat row_mat(row1->rows, row1->cols, row1->type, row1->data.ptr, 0);
+	cv::Mat nearest_mat(nearest->rows, nearest->cols, nearest->type, nearest->data.ptr, 0);
+	result = knn->findNearest(row_mat, K, nearest_mat, cv::noArray(), cv::noArray());
 	
 	int accuracy=0;
 	for(int i=0;i<K;i++){
@@ -154,7 +160,7 @@ basicOCR::basicOCR()
 {
 
 	//initial
-	sprintf(file_path , "../OCR/");
+	sprintf(file_path , "../../OCR/");
 	train_samples = 50;
 	classes= 10;
 	size=40;
