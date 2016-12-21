@@ -31,7 +31,7 @@ class basicOCR{
 		CvMat* trainClasses;
 		int size;
 		static const int K=10;
-		CvKNearest *knn;
+		cv::Ptr<cv::ml::KNearest> knn;
 		void getData();
 		void train();
 };
